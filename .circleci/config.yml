@@ -24,7 +24,7 @@ references:
       - v1-{{ checksum "Dockerfile" }}-{{ .Environment.CIRCLE_SHA1 }}-{{ .Environment.CIRCLE_WORKFLOW_ID }}
 
 jobs:
-  build_container:
+  build:
     <<: *container_config
     steps:
       - checkout
@@ -46,7 +46,7 @@ jobs:
           paths:
             - "/caches"
 
-  push_container:
+  push:
     <<: *container_config
     steps:
       - checkout
@@ -66,15 +66,15 @@ jobs:
             docker push orangesys/${CIRCLE_PROJECT_REPONAME}:${version}
 workflows:
   version: 2
-  build-and-deploy:
+  build-and-push:
     jobs:
-      - build_container:
+      - build:
           filters:
             tags:
               only: /^v[0-9]+(\.[0-9]+)*(-.*)*/ 
-      - push_container:
+      - push:
           requires:
-            - build_container
+            - build
           filters:
             tags:
               only: /^v[0-9]+(\.[0-9]+)*(-.*)*/
